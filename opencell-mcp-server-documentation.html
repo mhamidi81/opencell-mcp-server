@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Opencell MCP Server - Documentation</title>
+<style>
+  @media print {
+    body { font-size: 11pt; }
+    .page-break { page-break-before: always; }
+    h1, h2, h3 { page-break-after: avoid; }
+    pre, table { page-break-inside: avoid; }
+  }
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a2e;
+    --accent: #0f3460;
+    --accent2: #16213e;
+    --border: #e0e0e0;
+    --code-bg: #f4f4f8;
+    --highlight: #e94560;
+    --success: #2ecc71;
+    --muted: #6c757d;
+    --tier1: #0f3460;
+    --tier2: #e94560;
+    --tier3: #2ecc71;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.7;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+  /* Cover */
+  .cover {
+    text-align: center;
+    padding: 80px 0 60px;
+    border-bottom: 3px solid var(--accent);
+    margin-bottom: 48px;
+  }
+  .cover h1 {
+    font-size: 2.8em;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+  .cover .subtitle {
+    font-size: 1.3em;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .cover .meta {
+    font-size: 0.95em;
+    color: var(--muted);
+  }
+  .cover .meta span { margin: 0 12px; }
+
+  /* Headings */
+  h1 { font-size: 2em; color: var(--accent); margin: 48px 0 16px; border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
+  h2 { font-size: 1.5em; color: var(--accent2); margin: 36px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 1.2em; color: var(--fg); margin: 24px 0 8px; }
+  h4 { font-size: 1.05em; color: var(--muted); margin: 16px 0 6px; }
+
+  p { margin: 8px 0 12px; }
+  ul, ol { margin: 8px 0 12px 24px; }
+  li { margin: 4px 0; }
+
+  /* Code */
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 12px 0 16px;
+    font-size: 0.85em;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 0.92em;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+  }
+  tr:nth-child(even) { background: #f8f9fa; }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: white;
+  }
+  .badge-tier1 { background: var(--tier1); }
+  .badge-tier2 { background: var(--tier2); }
+  .badge-tier3 { background: var(--tier3); }
+
+  /* Callouts */
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: #f0f4ff;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout.warning {
+    border-left-color: var(--highlight);
+    background: #fff5f5;
+  }
+  .callout.success {
+    border-left-color: var(--success);
+    background: #f0fff4;
+  }
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  /* File tree */
+  .file-tree {
+    font-family: monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-size: 0.88em;
+    line-height: 1.6;
+  }
+  .file-tree .dir { color: var(--accent); font-weight: 600; }
+  .file-tree .file { color: var(--fg); }
+  .file-tree .comment { color: var(--muted); font-style: italic; }
+
+  /* TOC */
+  .toc {
+    background: #f8f9fa;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 28px;
+    margin: 24px 0;
+  }
+  .toc h2 { border: none; margin-top: 0; }
+  .toc ol { margin-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* Diagram */
+  .diagram {
+    background: var(--code-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    text-align: center;
+    font-family: monospace;
+    font-size: 0.85em;
+    line-height: 1.4;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 40px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ COVER -->
+<div class="cover">
+  <h1>Opencell MCP Server</h1>
+  <div class="subtitle">Model Context Protocol Server for Opencell Billing System</div>
+  <div class="meta">
+    <span>Version 1.0.0</span> |
+    <span>March 2026</span> |
+    <span>TypeScript / Node.js</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ TOC -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#context">Context &amp; Motivation</a></li>
+    <li><a href="#architecture">Architecture Overview</a></li>
+    <li><a href="#tools">Tool Reference</a>
+      <ol>
+        <li><a href="#tier3">Tier 3 &ndash; Discovery &amp; Utility Tools</a></li>
+        <li><a href="#tier1">Tier 1 &ndash; Generic CRUD Tools</a></li>
+        <li><a href="#tier2">Tier 2 &ndash; Domain Action Tools</a></li>
+      </ol>
+    </li>
+    <li><a href="#project-structure">Project Structure</a></li>
+    <li><a href="#implementation">Implementation Details</a>
+      <ol>
+        <li><a href="#config">Configuration</a></li>
+        <li><a href="#auth">Authentication (OAuth/Keycloak)</a></li>
+        <li><a href="#http-client">HTTP Client</a></li>
+        <li><a href="#error-handling">Error Handling</a></li>
+        <li><a href="#transport">Transport (stdio &amp; HTTP/SSE)</a></li>
+      </ol>
+    </li>
+    <li><a href="#source-files">Source File Inventory</a></li>
+    <li><a href="#configuration-ref">Configuration Reference</a></li>
+    <li><a href="#usage">Usage Guide</a></li>
+    <li><a href="#api-mapping">Opencell API Mapping</a></li>
+    <li><a href="#phased-plan">Phased Implementation Plan</a></li>
+    <li><a href="#verification">Verification &amp; Testing</a></li>
+  </ol>
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 1. CONTEXT -->
+<h1 id="context">1. Context &amp; Motivation</h1>
+
+<p>
+  <strong>Opencell</strong> is a Java EE/Jakarta EE billing platform with ~93 REST API v2 endpoints covering the full
+  quote-to-cash lifecycle: quotes, orders, invoicing, payments, dunning, catalog management, mediation, and more.
+</p>
+
+<div class="callout">
+  <strong>The Challenge</strong>
+  With ~93 resources &times; ~5 operations each = ~465 potential tools. Exposing all of them individually to an LLM
+  would overwhelm the context window and degrade tool selection accuracy.
+</div>
+
+<p><strong>The Solution:</strong> A three-tier MCP server that reduces 465 potential tools down to ~30 well-organized tools:</p>
+<ul>
+  <li><strong>Tier 1:</strong> Generic CRUD tools leveraging Opencell's existing <code>/v2/generic</code> endpoint</li>
+  <li><strong>Tier 2:</strong> Domain-specific action tools for non-CRUD business operations</li>
+  <li><strong>Tier 3:</strong> Discovery &amp; utility tools for entity introspection</li>
+</ul>
+
+<p><strong>Consumers:</strong></p>
+<ul>
+  <li>AI agents (Claude Code, Claude Desktop, etc.) via stdio transport</li>
+  <li>Internal tooling and automation pipelines via HTTP/SSE transport</li>
+</ul>
+
+<p><strong>Tech Stack:</strong> TypeScript, <code>@modelcontextprotocol/sdk</code>, Zod, Node.js 22+</p>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 2. ARCHITECTURE -->
+<h1 id="architecture">2. Architecture Overview</h1>
+
+<div class="diagram">
+                         +------------------+
+                         |   AI Agent /      |
+                         |   Internal Tool   |
+                         +--------+---------+
+                                  |
+                     stdio (CLI)  |  HTTP/SSE (remote)
+                                  |
+                  +---------------+---------------+
+                  |       MCP Server (Node.js)    |
+                  |                               |
+                  |  +-------------------------+  |
+                  |  |    Tool Registry         |  |
+                  |  |                         |  |
+                  |  |  Tier 3: Discovery (4)  |  |
+                  |  |  Tier 1: CRUD     (5)  |  |
+                  |  |  Tier 2: Actions (12)  |  |
+                  |  +----------+--------------+  |
+                  |             |                  |
+                  |  +----------+--------------+  |
+                  |  |    Opencell HTTP Client  |  |
+                  |  |    (auth, retry, timeout)|  |
+                  |  +----------+--------------+  |
+                  |             |                  |
+                  +-------------|------------------+
+                                |
+                     +----------+-----------+
+                     |    Keycloak OAuth     |
+                     |  (token management)   |
+                     +----------+-----------+
+                                |
+                     +----------+-----------+
+                     |   Opencell REST API   |
+                     |   /api/rest/v2/*      |
+                     +----------------------+
+</div>
+
+<h2>Three-Tier Tool Model</h2>
+
+<table>
+  <tr>
+    <th>Tier</th>
+    <th>Purpose</th>
+    <th>Count</th>
+    <th>Strategy</th>
+  </tr>
+  <tr>
+    <td><span class="badge badge-tier3">Tier 3</span></td>
+    <td>Discovery &amp; Utility</td>
+    <td>4</td>
+    <td>Entity introspection, version info, help guide</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-tier1">Tier 1</span></td>
+    <td>Generic CRUD</td>
+    <td>5</td>
+    <td>Wraps <code>/v2/generic</code> endpoint &mdash; works with <em>any</em> entity</td>
+  </tr>
+  <tr>
+    <td><span class="badge badge-tier2">Tier 2</span></td>
+    <td>Domain Actions</td>
+    <td>12</td>
+    <td>Business operations that can't be expressed as generic CRUD</td>
+  </tr>
+</table>
+
+<div class="callout success">
+  <strong>Key Insight</strong>
+  Opencell already has a generic CRUD API at <code>/v2/generic</code> that handles any entity by name.
+  By wrapping it, we avoid duplicating 400+ individual CRUD tools. An LLM discovers entities at runtime
+  via <code>list_entities</code> and <code>describe_entity</code>, then operates on them with generic tools.
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 3. TOOLS -->
+<h1 id="tools">3. Tool Reference</h1>
+
+<!-- Tier 3 -->
+<h2 id="tier3">3.1 Tier 3 &ndash; Discovery &amp; Utility Tools</h2>
+
+<table>
+  <tr><th>Tool Name</th><th>Description</th><th>Key Parameters</th></tr>
+  <tr>
+    <td><code>list_entities</code></td>
+    <td>List all queryable entity names in the Opencell system</td>
+    <td><code>onlyBusinessEntities</code>, <code>withFullName</code></td>
+  </tr>
+  <tr>
+    <td><code>describe_entity</code></td>
+    <td>Get field names, types, and relationships for an entity</td>
+    <td><code>entityName</code>, <code>depth</code>, <code>filter</code></td>
+  </tr>
+  <tr>
+    <td><code>opencell_version</code></td>
+    <td>Get system version information</td>
+    <td><em>none</em></td>
+  </tr>
+  <tr>
+    <td><code>help</code></td>
+    <td>Show available tools and usage guide</td>
+    <td><em>none</em></td>
+  </tr>
+</table>
+
+<!-- Tier 1 -->
+<h2 id="tier1">3.2 Tier 1 &ndash; Generic CRUD Tools</h2>
+
+<table>
+  <tr><th>Tool Name</th><th>Description</th><th>Key Parameters</th></tr>
+  <tr>
+    <td><code>generic_list</code></td>
+    <td>List/search any entity with filtering, sorting, pagination</td>
+    <td><code>entityName</code>, <code>filters</code>, <code>offset</code>, <code>limit</code>, <code>sortBy</code>, <code>sortOrder</code>, <code>fields</code>, <code>nestedEntities</code>, <code>fullTextFilter</code></td>
+  </tr>
+  <tr>
+    <td><code>generic_get</code></td>
+    <td>Get a single entity by name and ID</td>
+    <td><code>entityName</code>, <code>id</code>, <code>fields</code>, <code>nestedEntities</code>, <code>nestedDepth</code></td>
+  </tr>
+  <tr>
+    <td><code>generic_create</code></td>
+    <td>Create a new entity by name</td>
+    <td><code>entityName</code>, <code>data</code></td>
+  </tr>
+  <tr>
+    <td><code>generic_update</code></td>
+    <td>Update an existing entity by name and ID</td>
+    <td><code>entityName</code>, <code>id</code>, <code>data</code></td>
+  </tr>
+  <tr>
+    <td><code>generic_delete</code></td>
+    <td>Delete an entity by name and ID</td>
+    <td><code>entityName</code>, <code>id</code></td>
+  </tr>
+</table>
+
+<div class="callout">
+  <strong>Generic API Contract</strong>
+  The generic tools call the Opencell <code>/v2/generic</code> API:
+  <ul>
+    <li><code>POST /generic/all/{entityName}</code> &ndash; list with <code>GenericPagingAndFiltering</code> body</li>
+    <li><code>POST /generic/{entityName}/{id}</code> &ndash; get by ID</li>
+    <li><code>POST /generic/{entityName}</code> &ndash; create (JSON body)</li>
+    <li><code>PUT /generic/{entityName}/{id}</code> &ndash; update (JSON body)</li>
+    <li><code>DELETE /generic/{entityName}/{id}</code> &ndash; delete</li>
+  </ul>
+  Entity names are case-insensitive. The <code>GenericPagingAndFiltering</code> DTO supports:
+  <code>genericFields</code>, <code>nestedEntities</code>, <code>nestedDepth</code>, <code>filters</code>,
+  <code>fullTextFilter</code>, <code>offset</code>, <code>limit</code>, <code>sortBy</code>, <code>sortOrder</code>,
+  <code>excluding</code>, <code>groupBy</code>, <code>having</code>, and more.
+</div>
+
+<!-- Tier 2 -->
+<h2 id="tier2">3.3 Tier 2 &ndash; Domain Action Tools</h2>
+
+<h3>invoice_actions</h3>
+<p>Perform business operations on invoices.</p>
+<table>
+  <tr><th>Action</th><th>HTTP Call</th><th>Description</th></tr>
+  <tr><td><code>cancel</code></td><td>PUT /{id}/cancellation</td><td>Cancel an invoice</td></tr>
+  <tr><td><code>validate</code></td><td>PUT /{id}/validation</td><td>Validate an invoice</td></tr>
+  <tr><td><code>reject</code></td><td>PUT /{id}/rejection</td><td>Reject an invoice</td></tr>
+  <tr><td><code>rebuild</code></td><td>PUT /{id}/rebuild</td><td>Rebuild an invoice</td></tr>
+  <tr><td><code>calculate</code></td><td>PUT /{id}/calculation</td><td>Calculate invoice totals</td></tr>
+  <tr><td><code>getPdf</code></td><td>GET /{id}/pdf</td><td>Get invoice PDF</td></tr>
+  <tr><td><code>deletePdf</code></td><td>POST /{id}/deletePdfFile</td><td>Delete PDF file</td></tr>
+  <tr><td><code>deleteXml</code></td><td>POST /{id}/deleteXmlFile</td><td>Delete XML file</td></tr>
+  <tr><td><code>createBasic</code></td><td>POST /basicInvoices</td><td>Create a basic invoice</td></tr>
+  <tr><td><code>addLines</code></td><td>POST /{id}/invoiceLines</td><td>Add invoice lines</td></tr>
+  <tr><td><code>updateLine</code></td><td>PUT /{id}/invoiceLines/{lineId}</td><td>Update an invoice line</td></tr>
+  <tr><td><code>removeLines</code></td><td>DELETE /{id}/invoiceLines</td><td>Remove invoice lines</td></tr>
+  <tr><td><code>duplicate</code></td><td>POST /{id}/duplication</td><td>Duplicate an invoice</td></tr>
+  <tr><td><code>generate</code></td><td>POST /generate</td><td>Generate invoices</td></tr>
+  <tr><td><code>createAdjustment</code></td><td>POST /{id}/createAdjustment</td><td>Create invoice adjustment</td></tr>
+  <tr><td><code>duplicateLines</code></td><td>POST /{id}/invoiceLines/duplicate</td><td>Duplicate invoice lines</td></tr>
+  <tr><td><code>quarantine</code></td><td>PUT /{id}/quarantine</td><td>Quarantine an invoice</td></tr>
+  <tr><td><code>refreshRate</code></td><td>PUT /{id}/refreshRate</td><td>Refresh exchange rate</td></tr>
+  <tr><td><code>calculateSubTotals</code></td><td>POST /{id}/calculateSubTotals</td><td>Calculate subtotals</td></tr>
+  <tr><td><code>validateMultiple</code></td><td>PUT /validation</td><td>Validate multiple invoices</td></tr>
+  <tr><td><code>quarantineMultiple</code></td><td>PUT /quarantine</td><td>Quarantine multiple invoices</td></tr>
+  <tr><td><code>rejectMultiple</code></td><td>PUT /rejection</td><td>Reject multiple invoices</td></tr>
+  <tr><td><code>setCustomRate</code></td><td>PUT /{id}/setCustomRate</td><td>Set custom exchange rate</td></tr>
+  <tr><td><code>updateValidated</code></td><td>PUT /validated/{id}</td><td>Update a validated invoice</td></tr>
+</table>
+
+<h3>invoicing_actions</h3>
+<p>Manage billing runs.</p>
+<table>
+  <tr><th>Action</th><th>HTTP Call</th><th>Description</th></tr>
+  <tr><td><code>createExceptionalBillingRun</code></td><td>POST /exceptionalBillingRun</td><td>Create exceptional billing run</td></tr>
+  <tr><td><code>advanceStatus</code></td><td>PUT /{id}/advanceStatus</td><td>Advance billing run status</td></tr>
+  <tr><td><code>cancelBillingRun</code></td><td>POST /{id}/cancelBillingRun</td><td>Cancel a billing run</td></tr>
+  <tr><td><code>closeInvoiceLines</code></td><td>PUT /{id}/closeInvoiceLines</td><td>Close invoice lines in a run</td></tr>
+  <tr><td><code>enableBillingRun</code></td><td>POST /{id}/enableBillingRun</td><td>Enable a billing run</td></tr>
+  <tr><td><code>disableBillingRun</code></td><td>POST /{id}/disableBillingRun</td><td>Disable a billing run</td></tr>
+</table>
+
+<h3>payment_actions</h3>
+<p>Process payments and manage rejection codes.</p>
+<table>
+  <tr><th>Action</th><th>HTTP Call</th><th>Description</th></tr>
+  <tr><td><code>payByCard</code></td><td>POST /paymentByCard</td><td>Payment by card</td></tr>
+  <tr><td><code>payBySepa</code></td><td>POST /paymentBySepa</td><td>Payment by SEPA</td></tr>
+  <tr><td><code>createRejectionPayment</code></td><td>POST /rejection</td><td>Create rejection payment</td></tr>
+  <tr><td><code>retryPayment</code></td><td>POST /{id}/retry</td><td>Retry a failed payment</td></tr>
+  <tr><td colspan="3"><em>+ 13 more actions for rejection codes, actions, groups management</em></td></tr>
+</table>
+
+<h3>dunning_actions</h3>
+<p>Manage dunning collection plans.</p>
+<table>
+  <tr><th>Action</th><th>HTTP Call</th><th>Description</th></tr>
+  <tr><td><code>switch</code></td><td>POST /switch/{id}</td><td>Switch collection plan policy</td></tr>
+  <tr><td><code>massSwitch</code></td><td>POST /massSwitch</td><td>Mass switch collection plans</td></tr>
+  <tr><td><code>pause</code></td><td>POST /pause/{id}</td><td>Pause a collection plan</td></tr>
+  <tr><td><code>resume</code></td><td>POST /resume/{id}</td><td>Resume a paused plan</td></tr>
+  <tr><td><code>stop</code></td><td>POST /stop/{id}</td><td>Stop a collection plan</td></tr>
+  <tr><td><code>sendEmail</code></td><td>POST /executeDunningActionInstance/sendByEmail</td><td>Send dunning email</td></tr>
+  <tr><td colspan="3"><em>+ 11 more actions for mass operations, level/action instance management</em></td></tr>
+</table>
+
+<h3>account_actions</h3>
+<p>Account management operations.</p>
+<table>
+  <tr><th>Action</th><th>HTTP Call</th><th>Description</th></tr>
+  <tr><td><code>transferSubscription</code></td><td>POST /subscriptions/{code}/transfer</td><td>Transfer subscription between accounts</td></tr>
+  <tr><td><code>moveCustomerAccount</code></td><td>POST /customerAccounts/{code}/moving</td><td>Move customer account to new parent</td></tr>
+  <tr><td><code>moveBillingAccount</code></td><td>POST /billingAccounts/{code}/moving</td><td>Move billing account to new parent</td></tr>
+  <tr><td><code>createCounterInstance</code></td><td>POST /counterInstance</td><td>Create a counter instance</td></tr>
+  <tr><td><code>updateCounterInstance</code></td><td>PUT /counterInstance/{id}</td><td>Update a counter instance</td></tr>
+  <tr><td><code>applyOneShotCharges</code></td><td>POST /subscriptions/applyOneShotChargeList</td><td>Apply one-shot charges to subscriptions</td></tr>
+  <tr><td><code>getAllParentCustomers</code></td><td>GET /customer/{code}/getAllParentCustomers</td><td>Get all parent customers</td></tr>
+</table>
+
+<h3>Other Domain Action Tools</h3>
+<table>
+  <tr><th>Tool</th><th>Actions</th><th>Description</th></tr>
+  <tr><td><code>order_actions</code></td><td>findByCode</td><td>Find orders by code</td></tr>
+  <tr><td><code>cpq_actions</code></td><td>getAvailableOpenOrders, sendQuoteByEmail, createBillingRule, updateBillingRule, deleteBillingRule</td><td>CPQ quote and contract operations</td></tr>
+  <tr><td><code>catalog_actions</code></td><td>16 actions for price plans, price lists, price list lines, discount plans</td><td>Catalog and pricing management</td></tr>
+  <tr><td><code>mediation_actions</code></td><td>listCdrs, getCdr, createCdr, updateCdr, deleteCdr</td><td>CDR (Charge Detail Record) management</td></tr>
+  <tr><td><code>indexation_actions</code></td><td>closeIndex, enableIndex, disableIndex, createOrUpdateIndex, validateBatch, cancelBatch, cancelPriceIndexation</td><td>Price indexation management</td></tr>
+  <tr><td><code>document_actions</code></td><td>getFile, getFileVersion, updateFile, updateFileVersion, deleteFileVersion</td><td>Document file management with versioning</td></tr>
+  <tr><td><code>reporting_actions</code></td><td>executeQuery, verifyQuery, getQueryResults, downloadResults, createScheduler, getScheduler, exportAgedReceivables</td><td>Report execution and export</td></tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 4. PROJECT STRUCTURE -->
+<h1 id="project-structure" class="page-break">4. Project Structure</h1>
+
+<div class="file-tree">
+<span class="dir">opencell-mcp-server/</span>
+  <span class="file">package.json</span>                    <span class="comment"># Dependencies &amp; scripts</span>
+  <span class="file">tsconfig.json</span>                   <span class="comment"># TypeScript configuration</span>
+  <span class="file">.env.example</span>                    <span class="comment"># Environment variable template</span>
+  <span class="dir">src/</span>
+    <span class="file">index.ts</span>                      <span class="comment"># Entry point, transport selection</span>
+    <span class="file">config.ts</span>                     <span class="comment"># Environment config loading &amp; validation</span>
+    <span class="file">server.ts</span>                     <span class="comment"># MCP Server init &amp; tool registration</span>
+    <span class="dir">auth/</span>
+      <span class="file">keycloak-client.ts</span>          <span class="comment"># OAuth token acquisition &amp; refresh</span>
+    <span class="dir">http/</span>
+      <span class="file">opencell-client.ts</span>          <span class="comment"># HTTP client (auth headers, retry, timeout)</span>
+    <span class="dir">schemas/</span>
+      <span class="file">common.ts</span>                   <span class="comment"># Shared Zod schemas (pagination, filters)</span>
+    <span class="dir">utils/</span>
+      <span class="file">error-mapper.ts</span>             <span class="comment"># HTTP &rarr; MCP error mapping</span>
+      <span class="file">pagination.ts</span>               <span class="comment"># Paginated response formatting</span>
+      <span class="file">response-formatter.ts</span>       <span class="comment"># Standard success/error results</span>
+    <span class="dir">tools/</span>
+      <span class="file">registry.ts</span>                 <span class="comment"># Central tool registration</span>
+      <span class="dir">generic/</span>
+        <span class="file">list-entities.tool.ts</span>     <span class="comment"># list_entities</span>
+        <span class="file">describe-entity.tool.ts</span>   <span class="comment"># describe_entity</span>
+        <span class="file">generic-crud.tool.ts</span>      <span class="comment"># generic_list/get/create/update/delete</span>
+        <span class="file">version.tool.ts</span>           <span class="comment"># opencell_version</span>
+        <span class="file">help.tool.ts</span>              <span class="comment"># help</span>
+      <span class="dir">domains/</span>
+        <span class="file">invoice-actions.tool.ts</span>   <span class="comment"># 24 invoice actions</span>
+        <span class="file">invoicing-actions.tool.ts</span> <span class="comment"># 6 billing run actions</span>
+        <span class="file">payment-actions.tool.ts</span>   <span class="comment"># 17 payment actions</span>
+        <span class="file">dunning-actions.tool.ts</span>   <span class="comment"># 17 dunning/collection actions</span>
+        <span class="file">account-actions.tool.ts</span>   <span class="comment"># 7 account management actions</span>
+        <span class="file">order-actions.tool.ts</span>     <span class="comment"># Order actions</span>
+        <span class="file">cpq-actions.tool.ts</span>       <span class="comment"># 5 CPQ actions</span>
+        <span class="file">catalog-actions.tool.ts</span>   <span class="comment"># 16 catalog/pricing actions</span>
+        <span class="file">mediation-actions.tool.ts</span> <span class="comment"># 5 CDR actions</span>
+        <span class="file">indexation-actions.tool.ts</span><span class="comment"># 7 indexation actions</span>
+        <span class="file">document-actions.tool.ts</span>  <span class="comment"># 5 document file actions</span>
+        <span class="file">reporting-actions.tool.ts</span> <span class="comment"># 7 reporting actions</span>
+</div>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 5. IMPLEMENTATION DETAILS -->
+<h1 id="implementation" class="page-break">5. Implementation Details</h1>
+
+<h2 id="config">5.1 Configuration</h2>
+<p>All configuration is via environment variables, validated at startup with fail-fast behavior.</p>
+
+<pre><code># .env.example
+
+# Opencell API
+OPENCELL_BASE_URL=https://opencell.example.com/opencell/api/rest
+OPENCELL_API_VERSION=v2
+
+# Keycloak Authentication
+KEYCLOAK_URL=https://keycloak.example.com
+KEYCLOAK_REALM=opencell
+KEYCLOAK_CLIENT_ID=opencell-mcp
+KEYCLOAK_CLIENT_SECRET=changeme
+
+# Transport
+MCP_TRANSPORT=stdio          # "stdio" or "http"
+MCP_HTTP_PORT=3000
+
+# Behavior
+MCP_DEFAULT_PAGE_SIZE=50
+MCP_MAX_PAGE_SIZE=500
+MCP_REQUEST_TIMEOUT_MS=30000
+MCP_LOG_LEVEL=info</code></pre>
+
+<p>The <code>Config</code> interface provides typed access to all settings:</p>
+<pre><code>interface Config {
+  opencellBaseUrl: string;       // Base URL of Opencell REST API
+  opencellApiVersion: string;    // API version (default: "v2")
+  keycloakUrl: string;           // Keycloak server URL
+  keycloakRealm: string;         // Keycloak realm
+  keycloakClientId: string;      // OAuth client ID
+  keycloakClientSecret: string;  // OAuth client secret
+  mcpTransport: "stdio" | "http";
+  mcpHttpPort: number;
+  defaultPageSize: number;
+  maxPageSize: number;
+  requestTimeoutMs: number;
+  logLevel: "debug" | "info" | "warn" | "error";
+}</code></pre>
+
+<h2 id="auth">5.2 Authentication (OAuth/Keycloak)</h2>
+
+<p>The <code>KeycloakClient</code> manages the full OAuth token lifecycle:</p>
+
+<div class="diagram">
+First Request
+     |
+     v
++-----------+     +------------------+     +-----------+
+| Has valid | YES | Return cached    |     | Opencell  |
+| token?    |---->| access_token     |---->| API Call  |
++-----------+     +------------------+     +-----------+
+     | NO
+     v
++-----------+     +------------------+
+| Has valid | YES | POST /token      |
+| refresh?  |---->| grant=refresh    |---+
++-----------+     +------------------+   |
+     | NO                                |
+     v                                   v
++------------------+            +------------------+
+| POST /token      |            | Cache new token  |
+| grant=client_cred|----------->| (30s early       |
++------------------+            |  expiry buffer)  |
+                                +------------------+
+</div>
+
+<p>Key behaviors:</p>
+<ul>
+  <li>Token URL: <code>{KEYCLOAK_URL}/realms/{REALM}/protocol/openid-connect/token</code></li>
+  <li>Grant type: <code>client_credentials</code></li>
+  <li>Tokens cached in memory with 30-second early expiry buffer</li>
+  <li>Automatic refresh using refresh token when available</li>
+  <li>Falls back to full re-authentication if refresh fails</li>
+</ul>
+
+<h2 id="http-client">5.3 HTTP Client</h2>
+
+<p>The <code>OpencellClient</code> wraps <code>fetch()</code> with:</p>
+<ul>
+  <li>Automatic <code>Authorization: Bearer {token}</code> header injection</li>
+  <li>Request timeout via <code>AbortController</code> (configurable, default 30s)</li>
+  <li>Automatic retry on 401 (re-authenticates and retries once)</li>
+  <li>JSON serialization/deserialization</li>
+  <li>URL construction with query parameter support</li>
+</ul>
+
+<pre><code>// Methods available
+client.get(path, queryParams?)
+client.post(path, body?, queryParams?)
+client.put(path, body?, queryParams?)
+client.delete(path, queryParams?)
+
+// Returns
+interface HttpResponse {
+  status: number;
+  data: unknown;
+  headers: Record&lt;string, string&gt;;
+}</code></pre>
+
+<h2 id="error-handling">5.4 Error Handling</h2>
+
+<p>HTTP responses are mapped to MCP tool results:</p>
+<table>
+  <tr><th>HTTP Status</th><th>MCP Result</th><th>Message Prefix</th></tr>
+  <tr><td>200-299</td><td>Success (<code>isError: false</code>)</td><td>JSON response data</td></tr>
+  <tr><td>400</td><td>Error</td><td>"Bad Request (400): The request was invalid."</td></tr>
+  <tr><td>401</td><td>Error</td><td>"Unauthorized (401): Authentication failed."</td></tr>
+  <tr><td>403</td><td>Error</td><td>"Forbidden (403): Insufficient permissions."</td></tr>
+  <tr><td>404</td><td>Error</td><td>"Not Found (404): The requested resource was not found."</td></tr>
+  <tr><td>409</td><td>Error</td><td>"Conflict (409): The request conflicts with existing data."</td></tr>
+  <tr><td>429</td><td>Error</td><td>"Too Many Requests (429): Rate limit exceeded."</td></tr>
+  <tr><td>500</td><td>Error</td><td>"Internal Server Error (500)"</td></tr>
+</table>
+
+<p>Paginated list responses are formatted for LLM readability:</p>
+<pre><code>Found 142 total results (showing 1 to 50):
+
+[ ...data... ]
+
+Pagination: offset=0, limit=50, total=142
+Use offset=50 to see more results.</code></pre>
+
+<h2 id="transport">5.5 Transport</h2>
+
+<h3>stdio (default)</h3>
+<p>Uses <code>StdioServerTransport</code> from the MCP SDK. Ideal for Claude Code and CLI-based AI agents.</p>
+
+<h3>HTTP/SSE</h3>
+<p>Uses <code>SSEServerTransport</code> with a Node.js HTTP server. Supports multiple concurrent sessions.</p>
+<ul>
+  <li><code>GET /sse</code> &ndash; Establish SSE connection (returns session ID)</li>
+  <li><code>POST /messages?sessionId={id}</code> &ndash; Send messages to a session</li>
+  <li><code>GET /health</code> &ndash; Health check endpoint</li>
+</ul>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 6. SOURCE FILES -->
+<h1 id="source-files" class="page-break">6. Source File Inventory</h1>
+
+<table>
+  <tr><th>#</th><th>File</th><th>Purpose</th><th>Lines</th></tr>
+  <tr><td>1</td><td><code>src/index.ts</code></td><td>Entry point, stdio &amp; HTTP/SSE transport</td><td>~70</td></tr>
+  <tr><td>2</td><td><code>src/config.ts</code></td><td>Environment configuration</td><td>~40</td></tr>
+  <tr><td>3</td><td><code>src/server.ts</code></td><td>MCP Server creation</td><td>~15</td></tr>
+  <tr><td>4</td><td><code>src/auth/keycloak-client.ts</code></td><td>OAuth/Keycloak token management</td><td>~95</td></tr>
+  <tr><td>5</td><td><code>src/http/opencell-client.ts</code></td><td>HTTP client with auth &amp; retry</td><td>~95</td></tr>
+  <tr><td>6</td><td><code>src/schemas/common.ts</code></td><td>Shared Zod schemas</td><td>~30</td></tr>
+  <tr><td>7</td><td><code>src/utils/error-mapper.ts</code></td><td>HTTP &rarr; MCP error mapping</td><td>~50</td></tr>
+  <tr><td>8</td><td><code>src/utils/pagination.ts</code></td><td>Paginated response formatting</td><td>~30</td></tr>
+  <tr><td>9</td><td><code>src/utils/response-formatter.ts</code></td><td>Standard result helpers</td><td>~15</td></tr>
+  <tr><td>10</td><td><code>src/tools/registry.ts</code></td><td>Central tool registration</td><td>~40</td></tr>
+  <tr><td>11</td><td><code>src/tools/generic/list-entities.tool.ts</code></td><td>list_entities tool</td><td>~30</td></tr>
+  <tr><td>12</td><td><code>src/tools/generic/describe-entity.tool.ts</code></td><td>describe_entity tool</td><td>~30</td></tr>
+  <tr><td>13</td><td><code>src/tools/generic/generic-crud.tool.ts</code></td><td>5 generic CRUD tools</td><td>~120</td></tr>
+  <tr><td>14</td><td><code>src/tools/generic/version.tool.ts</code></td><td>opencell_version tool</td><td>~15</td></tr>
+  <tr><td>15</td><td><code>src/tools/generic/help.tool.ts</code></td><td>help tool</td><td>~50</td></tr>
+  <tr><td>16</td><td><code>src/tools/domains/invoice-actions.tool.ts</code></td><td>24 invoice actions</td><td>~100</td></tr>
+  <tr><td>17</td><td><code>src/tools/domains/invoicing-actions.tool.ts</code></td><td>6 billing run actions</td><td>~55</td></tr>
+  <tr><td>18</td><td><code>src/tools/domains/payment-actions.tool.ts</code></td><td>17 payment actions</td><td>~75</td></tr>
+  <tr><td>19</td><td><code>src/tools/domains/dunning-actions.tool.ts</code></td><td>17 dunning actions</td><td>~75</td></tr>
+  <tr><td>20</td><td><code>src/tools/domains/account-actions.tool.ts</code></td><td>7 account actions</td><td>~55</td></tr>
+  <tr><td>21</td><td><code>src/tools/domains/order-actions.tool.ts</code></td><td>Order actions</td><td>~35</td></tr>
+  <tr><td>22</td><td><code>src/tools/domains/cpq-actions.tool.ts</code></td><td>5 CPQ actions</td><td>~50</td></tr>
+  <tr><td>23</td><td><code>src/tools/domains/catalog-actions.tool.ts</code></td><td>16 catalog actions</td><td>~75</td></tr>
+  <tr><td>24</td><td><code>src/tools/domains/mediation-actions.tool.ts</code></td><td>5 CDR actions</td><td>~40</td></tr>
+  <tr><td>25</td><td><code>src/tools/domains/indexation-actions.tool.ts</code></td><td>7 indexation actions</td><td>~55</td></tr>
+  <tr><td>26</td><td><code>src/tools/domains/document-actions.tool.ts</code></td><td>5 document actions</td><td>~45</td></tr>
+  <tr><td>27</td><td><code>src/tools/domains/reporting-actions.tool.ts</code></td><td>7 reporting actions</td><td>~60</td></tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 7. CONFIG REF -->
+<h1 id="configuration-ref" class="page-break">7. Configuration Reference</h1>
+
+<table>
+  <tr><th>Variable</th><th>Required</th><th>Default</th><th>Description</th></tr>
+  <tr><td><code>OPENCELL_BASE_URL</code></td><td>Yes</td><td>&mdash;</td><td>Opencell REST API base URL</td></tr>
+  <tr><td><code>OPENCELL_API_VERSION</code></td><td>No</td><td>v2</td><td>API version</td></tr>
+  <tr><td><code>KEYCLOAK_URL</code></td><td>Yes</td><td>&mdash;</td><td>Keycloak server URL</td></tr>
+  <tr><td><code>KEYCLOAK_REALM</code></td><td>Yes</td><td>&mdash;</td><td>Keycloak realm name</td></tr>
+  <tr><td><code>KEYCLOAK_CLIENT_ID</code></td><td>Yes</td><td>&mdash;</td><td>OAuth client ID</td></tr>
+  <tr><td><code>KEYCLOAK_CLIENT_SECRET</code></td><td>Yes</td><td>&mdash;</td><td>OAuth client secret</td></tr>
+  <tr><td><code>MCP_TRANSPORT</code></td><td>No</td><td>stdio</td><td>Transport mode: <code>stdio</code> or <code>http</code></td></tr>
+  <tr><td><code>MCP_HTTP_PORT</code></td><td>No</td><td>3000</td><td>HTTP server port (when transport=http)</td></tr>
+  <tr><td><code>MCP_DEFAULT_PAGE_SIZE</code></td><td>No</td><td>50</td><td>Default pagination page size</td></tr>
+  <tr><td><code>MCP_MAX_PAGE_SIZE</code></td><td>No</td><td>500</td><td>Maximum allowed page size</td></tr>
+  <tr><td><code>MCP_REQUEST_TIMEOUT_MS</code></td><td>No</td><td>30000</td><td>HTTP request timeout in milliseconds</td></tr>
+  <tr><td><code>MCP_LOG_LEVEL</code></td><td>No</td><td>info</td><td>Log level: debug, info, warn, error</td></tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 8. USAGE -->
+<h1 id="usage">8. Usage Guide</h1>
+
+<h2>8.1 Build</h2>
+<pre><code>cd opencell-mcp-server
+npm install
+npm run build</code></pre>
+
+<h2>8.2 Run (stdio)</h2>
+<pre><code># Set environment variables
+export OPENCELL_BASE_URL=https://your-instance/opencell/api/rest
+export KEYCLOAK_URL=https://your-keycloak
+export KEYCLOAK_REALM=opencell
+export KEYCLOAK_CLIENT_ID=opencell-mcp
+export KEYCLOAK_CLIENT_SECRET=your-secret
+
+npm start</code></pre>
+
+<h2>8.3 Run (HTTP/SSE)</h2>
+<pre><code>export MCP_TRANSPORT=http
+export MCP_HTTP_PORT=3000
+npm start
+# Server listening on http://localhost:3000
+# SSE endpoint: http://localhost:3000/sse
+# Health check: http://localhost:3000/health</code></pre>
+
+<h2>8.4 Claude Code Integration</h2>
+<p>Add to your Claude Code MCP settings (<code>~/.claude/settings.json</code> or project <code>.mcp.json</code>):</p>
+<pre><code>{
+  "mcpServers": {
+    "opencell": {
+      "command": "node",
+      "args": ["/path/to/opencell-mcp-server/dist/index.js"],
+      "env": {
+        "OPENCELL_BASE_URL": "https://your-instance/opencell/api/rest",
+        "KEYCLOAK_URL": "https://your-keycloak",
+        "KEYCLOAK_REALM": "opencell",
+        "KEYCLOAK_CLIENT_ID": "opencell-mcp",
+        "KEYCLOAK_CLIENT_SECRET": "your-secret"
+      }
+    }
+  }
+}</code></pre>
+
+<h2>8.5 Typical AI Agent Workflow</h2>
+<ol>
+  <li><strong>Discover:</strong> <code>list_entities</code> &rarr; shows all available entities (Invoice, Customer, BillingAccount, etc.)</li>
+  <li><strong>Inspect:</strong> <code>describe_entity({entityName: "Invoice"})</code> &rarr; shows fields, types, relationships</li>
+  <li><strong>Query:</strong> <code>generic_list({entityName: "Invoice", filters: {status: "VALIDATED"}, limit: 10})</code></li>
+  <li><strong>Read:</strong> <code>generic_get({entityName: "Invoice", id: 123})</code></li>
+  <li><strong>Act:</strong> <code>invoice_actions({action: "cancel", invoiceId: 123})</code></li>
+</ol>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 9. API MAPPING -->
+<h1 id="api-mapping" class="page-break">9. Opencell API Mapping</h1>
+
+<p>How Opencell API domains map to MCP tools:</p>
+
+<table>
+  <tr><th>Opencell API Domain</th><th>Endpoints</th><th>CRUD via</th><th>Actions via</th></tr>
+  <tr><td>Account Management</td><td>/v2/account/*</td><td><code>generic_*</code></td><td><code>account_actions</code></td></tr>
+  <tr><td>Billing &amp; Invoicing</td><td>/v2/billing/*</td><td><code>generic_*</code></td><td><code>invoice_actions</code>, <code>invoicing_actions</code></td></tr>
+  <tr><td>Payments &amp; Receivables</td><td>/v2/payment/*</td><td><code>generic_*</code></td><td><code>payment_actions</code></td></tr>
+  <tr><td>Accounting &amp; Finance</td><td>/v2/accounting/*</td><td><code>generic_*</code></td><td>&mdash;</td></tr>
+  <tr><td>Catalog &amp; Pricing</td><td>/v2/catalog/*</td><td><code>generic_*</code></td><td><code>catalog_actions</code></td></tr>
+  <tr><td>Ordering &amp; Quotes</td><td>/v2/ordering/*</td><td><code>generic_*</code></td><td><code>order_actions</code></td></tr>
+  <tr><td>CPQ</td><td>/v2/cpq/*</td><td><code>generic_*</code></td><td><code>cpq_actions</code></td></tr>
+  <tr><td>Dunning &amp; Collections</td><td>/v2/dunning/*</td><td><code>generic_*</code></td><td><code>dunning_actions</code></td></tr>
+  <tr><td>Indexation</td><td>/v2/indexation/*</td><td><code>generic_*</code></td><td><code>indexation_actions</code></td></tr>
+  <tr><td>Mediation &amp; CDR</td><td>/v2/mediation/*</td><td><code>generic_*</code></td><td><code>mediation_actions</code></td></tr>
+  <tr><td>Documents &amp; Files</td><td>/v2/document/*</td><td><code>generic_*</code></td><td><code>document_actions</code></td></tr>
+  <tr><td>Reporting</td><td>/v2/queryManagement/*</td><td><code>generic_*</code></td><td><code>reporting_actions</code></td></tr>
+  <tr><td>Settings &amp; Config</td><td>/v2/setting/*</td><td><code>generic_*</code></td><td>&mdash;</td></tr>
+  <tr><td>Audit &amp; Logging</td><td>/v2/auditData*</td><td><code>generic_*</code></td><td>&mdash;</td></tr>
+  <tr><td>Refunds &amp; Deposits</td><td>/v2/refund/*, /v2/securityDeposit/*</td><td><code>generic_*</code></td><td>&mdash;</td></tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 10. PHASED PLAN -->
+<h1 id="phased-plan">10. Phased Implementation Plan</h1>
+
+<table>
+  <tr><th>Phase</th><th>Scope</th><th>Status</th><th>Deliverable</th></tr>
+  <tr>
+    <td><strong>Phase 1</strong></td>
+    <td>Foundation: config, auth, HTTP client, 5 generic CRUD tools, 4 discovery tools, stdio transport</td>
+    <td style="color: #2ecc71; font-weight: bold;">COMPLETE</td>
+    <td>Working MCP server that can discover, list, read, create, update, delete any entity</td>
+  </tr>
+  <tr>
+    <td><strong>Phase 2</strong></td>
+    <td>Core domain actions: invoice, invoicing, payment, account, order, dunning</td>
+    <td style="color: #2ecc71; font-weight: bold;">COMPLETE</td>
+    <td>AI agents can manage the full quote-to-cash flow</td>
+  </tr>
+  <tr>
+    <td><strong>Phase 3</strong></td>
+    <td>Remaining domains: CPQ, catalog, mediation, indexation, documents, reporting + HTTP/SSE transport</td>
+    <td style="color: #2ecc71; font-weight: bold;">COMPLETE</td>
+    <td>Full domain coverage with dual transport support</td>
+  </tr>
+  <tr>
+    <td><strong>Phase 4</strong></td>
+    <td>Production readiness: logging, rate limiting, integration tests, Docker, comprehensive README</td>
+    <td style="color: var(--muted);">PLANNED</td>
+    <td>Production-grade deployment</td>
+  </tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ 11. VERIFICATION -->
+<h1 id="verification">11. Verification &amp; Testing</h1>
+
+<h2>11.1 Build Verification</h2>
+<pre><code># Type-check (no errors)
+npx tsc --noEmit
+
+# Build (compiles to dist/)
+npm run build</code></pre>
+<div class="callout success">
+  <strong>Build Status: PASSING</strong>
+  All 27 source files compile cleanly with strict TypeScript. No type errors, no warnings.
+</div>
+
+<h2>11.2 Testing Checklist</h2>
+
+<h3>Phase 1 Tests</h3>
+<ul>
+  <li>Configure Claude Code to use the MCP server via stdio</li>
+  <li>Run <code>list_entities</code> &mdash; verify entity names returned</li>
+  <li>Run <code>describe_entity</code> for <code>Invoice</code> &mdash; verify fields and types</li>
+  <li>Run <code>generic_list</code> for invoices &mdash; verify paginated results</li>
+  <li>Run <code>generic_get</code> for a specific invoice &mdash; verify full entity data</li>
+</ul>
+
+<h3>Phase 2 Tests</h3>
+<ul>
+  <li>Ask Claude to "cancel invoice #123" &mdash; verify it uses <code>invoice_actions</code> with <code>action=cancel</code></li>
+  <li>Ask Claude to "transfer subscription X to billing account Y" &mdash; verify <code>account_actions</code></li>
+  <li>Ask Claude to "create a payment by card" &mdash; verify <code>payment_actions</code></li>
+</ul>
+
+<h3>HTTP Transport Tests</h3>
+<ul>
+  <li>Start with <code>MCP_TRANSPORT=http</code></li>
+  <li>Connect via SSE from a test client</li>
+  <li>Verify tool listing and execution</li>
+  <li>Test concurrent sessions</li>
+</ul>
+
+<h3>Auth Tests</h3>
+<ul>
+  <li>Verify token acquisition on first request</li>
+  <li>Set short token TTL, verify automatic refresh</li>
+  <li>Verify retry on 401 during request</li>
+</ul>
+
+<hr class="section-divider">
+
+<!-- ═══════════════════════════════════════════════════════════ FOOTER -->
+<div style="text-align: center; padding: 40px 0 20px; color: var(--muted); font-size: 0.9em; border-top: 1px solid var(--border);">
+  <p><strong>Opencell MCP Server Documentation</strong></p>
+  <p>Generated March 2026 | Version 1.0.0</p>
+  <p>Location: <code>/home/mhamidi/workspace/oc/ai/mcps/opencell-mcp-server/</code></p>
+</div>
+
+</body>
+</html>
